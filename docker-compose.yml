@@ -1,0 +1,8 @@
+services:
+  web:
+    container_name: frontendsihul-frontend
+    build: .
+    image: frontendsihul:latest
+    ports:
+      - "${PORT:-3000}:80"
+    restart: unless-stopped
