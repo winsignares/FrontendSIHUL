@@ -5,8 +5,7 @@ import { GraduationCap, Lock, User, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AuthService } from '../lib/auth';
 import type { Usuario } from '../lib/models';
-// Reemplazado el import de Figma por un asset local para compatibilidad con Vite
-const universityImage = "/vite.svg";
+import universityImage from '../assets/Image/UniversidadLibre.webp';
 
 type UserRole = 'admin' | 'autorizado' | 'consultor' | null;
 
@@ -200,9 +199,12 @@ export default function Login({ onLogin }: LoginProps) {
             className="relative bg-gradient-to-br from-red-600 via-red-700 to-red-900 p-12 lg:p-16 flex flex-col justify-center items-center text-white overflow-hidden"
           >
             {/* Background Image with Overlay */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center opacity-40"
-              style={{ backgroundImage: `url(${universityImage})` }}
+            <div
+              className="absolute inset-0 bg-cover opacity-40"
+              style={{
+                backgroundImage: `url(${universityImage})`,
+                backgroundPosition: '80% center' // desplaza la imagen hacia la derecha
+              }}
             />
             
             {/* Animated Geometric Shapes */}
