@@ -7,7 +7,7 @@ import { AuthService } from '../lib/auth';
 import type { Usuario } from '../lib/models';
 import universityImage from '../assets/Image/UniversidadLibre.webp';
 
-type UserRole = 'admin' | 'autorizado' | 'consultor' | null;
+type UserRole = 'admin' | 'autorizado' | 'consultor' | 'consultorDocente' | 'consultorEstudiante' | null;
 
 interface LoginProps {
   onLogin: (role: UserRole, name: string, usuario: Usuario) => void;

@@ -11,9 +11,59 @@ import type {
 } from './models';
 
 export function initializeDatabase(): void {
-  // Solo inicializar si no hay datos
+  // Si ya estaba inicializada, hacemos verificación incremental (migración ligera)
   if (db.isInitialized()) {
-    console.log('✅ Base de datos ya inicializada');
+    const existentes = db.getUsuarios();
+
+    // Usuarios que deben existir siempre (para nuevas versiones)
+    const requiredUsers: Omit<Usuario, 'id'>[] = [
+      {
+        nombre: 'Laura Sánchez',
+        email: 'docente@unilibre.edu.co',
+        password: 'doc123',
+        rol: 'consultorDocente',
+        permisos: [
+          { componenteId: 'dashboard', permiso: 'ver' },
+          { componenteId: 'horarios', permiso: 'ver' },
+          { componenteId: 'prestamos', permiso: 'editar' },
+          { componenteId: 'notificaciones', permiso: 'ver' },
+          { componenteId: 'chat', permiso: 'ver' },
+          { componenteId: 'ajustes', permiso: 'ver' }
+        ],
+        programasRestringidos: [],
+        activo: true,
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        nombre: 'Miguel Ortega',
+        email: 'estudiante@unilibre.edu.co',
+        password: 'est123',
+        rol: 'consultorEstudiante',
+        permisos: [
+          { componenteId: 'dashboard', permiso: 'ver' },
+          { componenteId: 'horarios', permiso: 'ver' },
+          { componenteId: 'notificaciones', permiso: 'ver' },
+          { componenteId: 'chat', permiso: 'ver' },
+          { componenteId: 'ajustes', permiso: 'ver' }
+        ],
+        programasRestringidos: [],
+        activo: true,
+        fechaCreacion: new Date().toISOString()
+      }
+    ];
+
+    let creados = 0;
+    requiredUsers.forEach(u => {
+      if (!existentes.some(e => e.email === u.email)) {
+        db.createUsuario(u);
+        creados++;
+      }
+    });
+    if (creados > 0) {
+      console.log(`🔄 Migración de usuarios aplicada. ${creados} usuario(s) añadidos.`);
+    } else {
+      console.log('✅ Base de datos ya inicializada (sin migraciones pendientes)');
+    }
     return;
   }
 
@@ -77,6 +127,39 @@ export function initializeDatabase(): void {
         { componenteId: 'espacios', permiso: 'ver' },
         { componenteId: 'ocupacion', permiso: 'ver' },
         { componenteId: 'reportes', permiso: 'ver' },
+        { componenteId: 'notificaciones', permiso: 'ver' },
+        { componenteId: 'chat', permiso: 'ver' },
+        { componenteId: 'ajustes', permiso: 'ver' }
+      ],
+      programasRestringidos: [],
+      activo: true,
+      fechaCreacion: new Date().toISOString()
+    },
+    {
+      nombre: 'Laura Sánchez',
+      email: 'docente@unilibre.edu.co',
+      password: 'doc123',
+      rol: 'consultorDocente',
+      permisos: [
+        { componenteId: 'dashboard', permiso: 'ver' },
+        { componenteId: 'horarios', permiso: 'ver' },
+        { componenteId: 'prestamos', permiso: 'editar' },
+        { componenteId: 'notificaciones', permiso: 'ver' },
+        { componenteId: 'chat', permiso: 'ver' },
+        { componenteId: 'ajustes', permiso: 'ver' }
+      ],
+      programasRestringidos: [],
+      activo: true,
+      fechaCreacion: new Date().toISOString()
+    },
+    {
+      nombre: 'Miguel Ortega',
+      email: 'estudiante@unilibre.edu.co',
+      password: 'est123',
+      rol: 'consultorEstudiante',
+      permisos: [
+        { componenteId: 'dashboard', permiso: 'ver' },
+        { componenteId: 'horarios', permiso: 'ver' },
         { componenteId: 'notificaciones', permiso: 'ver' },
         { componenteId: 'chat', permiso: 'ver' },
         { componenteId: 'ajustes', permiso: 'ver' }
@@ -665,6 +748,22 @@ export function initializeDatabase(): void {
       tipo: 'info',
       titulo: 'Nuevo Periodo Académico',
       mensaje: 'El periodo 2025-1 ha sido activado.',
+      leida: false,
+      fecha: new Date().toISOString()
+    },
+    {
+      usuarioId: usuarios[3].email, // docente
+      tipo: 'info',
+      titulo: 'Horario publicado',
+      mensaje: 'Tu horario para 2025-1 ha sido publicado.',
+      leida: false,
+      fecha: new Date().toISOString()
+    },
+    {
+      usuarioId: usuarios[4].email, // estudiante
+      tipo: 'info',
+      titulo: 'Bienvenido estudiante',
+      mensaje: 'Tu acceso a Unispace ha sido habilitado.',
       leida: false,
       fecha: new Date().toISOString()
     }

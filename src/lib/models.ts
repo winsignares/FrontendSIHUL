@@ -7,7 +7,7 @@ export interface Usuario {
   nombre: string;
   email: string;
   password: string; // En producción esto estaría hasheado
-  rol: 'admin' | 'autorizado' | 'consultor';
+  rol: 'admin' | 'autorizado' | 'consultor' | 'consultorDocente' | 'consultorEstudiante';
   permisos: PermisoComponente[];
   programasRestringidos: string[]; // IDs de programas
   activo: boolean;
