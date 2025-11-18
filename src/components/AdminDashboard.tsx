@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { 
   LayoutDashboard, 
@@ -57,8 +58,13 @@ interface AdminDashboardProps {
 type MenuOption = 'home' | 'facultades' | 'asignaturas' | 'espacios' | 'horarios' | 'visualizacion' | 'periodos' | 'reportes' | 'fusion' | 'prestamos' | 'ocupacion' | 'notificaciones' | 'mensajeria' | 'ajustes' | 'chat' | 'usuarios';
 
 export default function AdminDashboard({ userName, onLogout, userRole }: AdminDashboardProps) {
-  const [activeMenu, setActiveMenu] = useState<MenuOption>('home');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
+  // Extraer la ruta activa de la URL
+  const pathSegments = location.pathname.split('/').filter(Boolean);
+  const activeMenu = (pathSegments[1] || 'home') as MenuOption;
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['gestion']);
   const [notificacionesSinLeer, setNotificacionesSinLeer] = useState(3);
   const [mensajesSinLeer, setMensajesSinLeer] = useState(3);
@@ -115,7 +121,7 @@ export default function AdminDashboard({ userName, onLogout, userRole }: AdminDa
   const renderContent = () => {
     switch (activeMenu) {
       case 'home':
-        return <DashboardHome onNavigate={(page) => setActiveMenu(page as any)} />;
+        return <DashboardHome onNavigate={(page) => navigate(`/admin/${page}`)} />;
       case 'facultades':
         return <FacultadesPrograms />;
       case 'asignaturas':
@@ -147,7 +153,7 @@ export default function AdminDashboard({ userName, onLogout, userRole }: AdminDa
       case 'usuarios':
         return <GestionUsuarios />;
       default:
-        return <DashboardHome onNavigate={(page) => setActiveMenu(page as any)} />;
+        return <DashboardHome onNavigate={(page) => navigate(`/admin/${page}`)} />;
     }
   };
 
@@ -239,7 +245,7 @@ export default function AdminDashboard({ userName, onLogout, userRole }: AdminDa
                             const buttonContent = (
                               <motion.button
                                 key={item.id}
-                                onClick={() => setActiveMenu(item.action as MenuOption)}
+                                onClick={() => navigate(`/admin/${item.action}`)}
                                 className={`w-full flex items-center gap-3 rounded-xl transition-all duration-200 group ${
                                   isSidebarCollapsed ? 'justify-center px-3 py-3' : 'px-4 py-3'
                                 } ${
@@ -402,7 +408,7 @@ export default function AdminDashboard({ userName, onLogout, userRole }: AdminDa
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('notificaciones')}
+                  onClick={() => navigate('/admin/notificaciones')}
                   animate={activeMenu === 'notificaciones' ? {
                     scale: [1, 1.1, 1],
                     rotate: [0, -10, 10, -10, 0]
@@ -445,7 +451,7 @@ export default function AdminDashboard({ userName, onLogout, userRole }: AdminDa
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('mensajeria')}
+                  onClick={() => navigate('/admin/mensajeria')}
                   animate={activeMenu === 'mensajeria' ? {
                     scale: [1, 1.08, 1],
                   } : {}}
@@ -487,7 +493,7 @@ export default function AdminDashboard({ userName, onLogout, userRole }: AdminDa
                 <motion.button
                   whileHover={{ scale: 1.05, rotate: 90, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('ajustes')}
+                  onClick={() => navigate('/admin/ajustes')}
                   animate={activeMenu === 'ajustes' ? {
                     rotate: [0, 180, 360],
                   } : {}}

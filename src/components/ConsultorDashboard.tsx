@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { 
   LayoutDashboard, 
@@ -41,8 +42,12 @@ interface ConsultorDashboardProps {
 type MenuOption = 'home' | 'horarios' | 'espacios' | 'prestamos' | 'ocupacion' | 'reportes' | 'notificaciones' | 'mensajeria' | 'ajustes';
 
 export default function ConsultorDashboard({ userName, onLogout }: ConsultorDashboardProps) {
-  const [activeMenu, setActiveMenu] = useState<MenuOption>('home');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
+  const pathSegments = location.pathname.split('/').filter(Boolean);
+  const activeMenu = (pathSegments[1] || 'home') as MenuOption;
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['consultas']);
   const [notificacionesSinLeer, setNotificacionesSinLeer] = useState(3);
   const [mensajesSinLeer, setMensajesSinLeer] = useState(2);
@@ -87,7 +92,7 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
   const renderContent = () => {
     switch (activeMenu) {
       case 'home':
-        return <ConsultorDashboardHome onNavigate={(page) => setActiveMenu(page as any)} />;
+        return <ConsultorDashboardHome onNavigate={(page) => navigate(`/consultor/${page}`)} />;
       case 'horarios':
         return <ConsultaHorarios />;
       case 'espacios':
@@ -105,7 +110,7 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
       case 'ajustes':
         return <Ajustes />;
       default:
-        return <ConsultorDashboardHome onNavigate={(page) => setActiveMenu(page as any)} />;
+        return <ConsultorDashboardHome onNavigate={(page) => navigate(`/consultor/${page}`)} />;
     }
   };
 
@@ -122,14 +127,12 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
 
   return (
     <div className="flex h-screen bg-slate-100 dark:bg-slate-900 overflow-hidden">
-      {/* Sidebar */}
       <TooltipProvider>
         <motion.aside
           animate={{ width: isSidebarCollapsed ? 80 : 280 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="bg-gradient-to-b from-red-900 via-red-800 to-red-950 flex flex-col relative shadow-2xl"
         >
-          {/* Logo */}
           <div className="p-6 border-b border-red-700/50 flex items-center justify-center">
             <motion.div 
               className="flex items-center gap-3"
@@ -155,12 +158,10 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
             </motion.div>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-6">
               {menuSections.map((section) => (
                 <div key={section.id}>
-                  {/* Section Header - Solo visible cuando no está colapsado */}
                   <AnimatePresence>
                     {!isSidebarCollapsed && (
                       <motion.button
@@ -182,7 +183,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                     )}
                   </AnimatePresence>
 
-                  {/* Menu Items */}
                   <AnimatePresence>
                     {(!isSidebarCollapsed && expandedMenus.includes(section.id)) || isSidebarCollapsed ? (
                       <motion.div
@@ -200,7 +200,7 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                             const buttonContent = (
                               <motion.button
                                 key={item.id}
-                                onClick={() => setActiveMenu(item.action as MenuOption)}
+                                onClick={() => navigate(`/consultor/${item.action}`)}
                                 className={`w-full flex items-center gap-3 rounded-xl transition-all duration-200 group ${
                                   isSidebarCollapsed ? 'justify-center px-3 py-3' : 'px-4 py-3'
                                 } ${
@@ -236,7 +236,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                               </motion.button>
                             );
 
-                            // Si está colapsado, envolver en Tooltip
                             if (isSidebarCollapsed) {
                               return (
                                 <Tooltip key={item.id} delayDuration={0}>
@@ -261,9 +260,7 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
             </div>
           </nav>
 
-          {/* Footer: Minimizar + Cerrar Sesión */}
           <div className="p-4 border-t border-red-700/50 space-y-2">
-            {/* Botón Minimizar */}
             <motion.button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
               className={`w-full flex items-center gap-2 rounded-xl bg-red-700/30 hover:bg-red-700/50 text-red-100 transition-colors ${
@@ -282,7 +279,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
               )}
             </motion.button>
 
-            {/* Botón Cerrar Sesión */}
             {isSidebarCollapsed ? (
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
@@ -312,9 +308,7 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
         </motion.aside>
       </TooltipProvider>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Navbar */}
         <motion.header 
           className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-sm"
           initial={{ y: -20, opacity: 0 }}
@@ -323,7 +317,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
         >
           <div className="px-6 py-4">
             <div className="flex items-center justify-between gap-4">
-              {/* Left: Menu Toggle + Title */}
               <div className="flex items-center gap-4">
                 <motion.button
                   onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -346,7 +339,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                 </div>
               </div>
 
-              {/* Center: Search Bar */}
               <div className="hidden md:flex flex-1 max-w-xl">
                 <div className="relative w-full">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -357,13 +349,11 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                 </div>
               </div>
 
-              {/* Right: Notifications + Messages + Settings + Avatar */}
               <div className="flex items-center gap-3">
-                {/* Notifications */}
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('notificaciones')}
+                  onClick={() => navigate('/consultor/notificaciones')}
                   animate={activeMenu === 'notificaciones' ? {
                     scale: [1, 1.1, 1],
                     rotate: [0, -10, 10, -10, 0]
@@ -402,11 +392,10 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                   )}
                 </motion.button>
 
-                {/* Messages */}
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('mensajeria')}
+                  onClick={() => navigate('/consultor/mensajeria')}
                   animate={activeMenu === 'mensajeria' ? {
                     scale: [1, 1.08, 1],
                   } : {}}
@@ -444,11 +433,10 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                   )}
                 </motion.button>
 
-                {/* Settings */}
                 <motion.button
-                  whileHover={{ scale: 1.05, rotate: 90 }}
+                  whileHover={{ scale: 1.05, rotate: 90, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('ajustes')}
+                  onClick={() => navigate('/consultor/ajustes')}
                   className={`relative p-2.5 rounded-xl transition-all ${
                     activeMenu === 'ajustes'
                       ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-500/50'
@@ -462,7 +450,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
                   }`} />
                 </motion.button>
 
-                {/* User Avatar */}
                 <motion.div 
                   className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700"
                   whileHover={{ scale: 1.02 }}
@@ -482,7 +469,6 @@ export default function ConsultorDashboard({ userName, onLogout }: ConsultorDash
           </div>
         </motion.header>
 
-        {/* Content Area */}
         <main className="flex-1 overflow-auto">
           <motion.div
             key={activeMenu}

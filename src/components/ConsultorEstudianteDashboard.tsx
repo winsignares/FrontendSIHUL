@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { 
   LayoutDashboard, 
@@ -33,8 +34,13 @@ interface ConsultorEstudianteDashboardProps {
 type MenuOption = 'home' | 'horario' | 'notificaciones' | 'mensajeria' | 'ajustes';
 
 export default function ConsultorEstudianteDashboard({ userName, onLogout }: ConsultorEstudianteDashboardProps) {
-  const [activeMenu, setActiveMenu] = useState<MenuOption>('home');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
+  // Extraer la ruta activa de la URL
+  const pathSegments = location.pathname.split('/').filter(Boolean);
+  const activeMenu = (pathSegments[1] || 'home') as MenuOption;
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['consultas']);
   const [notificacionesSinLeer, setNotificacionesSinLeer] = useState(3);
   const [mensajesSinLeer, setMensajesSinLeer] = useState(2);
@@ -69,7 +75,7 @@ export default function ConsultorEstudianteDashboard({ userName, onLogout }: Con
   const renderContent = () => {
     switch (activeMenu) {
       case 'home':
-        return <ConsultorEstudianteHome onNavigate={(m: string) => setActiveMenu(m as MenuOption)} />;
+        return <ConsultorEstudianteHome onNavigate={(m: string) => navigate(`/estudiante/${m}`)} />;
       case 'horario':
         return <HorarioEstudiante />;
       case 'notificaciones':
@@ -79,7 +85,7 @@ export default function ConsultorEstudianteDashboard({ userName, onLogout }: Con
       case 'ajustes':
         return <Ajustes />;
       default:
-        return <ConsultorEstudianteHome onNavigate={(m: string) => setActiveMenu(m as MenuOption)} />;
+        return <ConsultorEstudianteHome onNavigate={(m: string) => navigate(`/estudiante/${m}`)} />;
     }
   };
 
@@ -174,7 +180,7 @@ export default function ConsultorEstudianteDashboard({ userName, onLogout }: Con
                             const buttonContent = (
                               <motion.button
                                 key={item.id}
-                                onClick={() => setActiveMenu(item.action as MenuOption)}
+                                onClick={() => navigate(`/estudiante/${item.action}`)}
                                 className={`w-full flex items-center gap-3 rounded-xl transition-all duration-200 group ${
                                   isSidebarCollapsed ? 'justify-center px-3 py-3' : 'px-4 py-3'
                                 } ${
@@ -334,7 +340,7 @@ export default function ConsultorEstudianteDashboard({ userName, onLogout }: Con
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('notificaciones')}
+                  onClick={() => navigate('/estudiante/notificaciones')}
                   className={`relative p-2.5 rounded-xl transition-all ${
                     activeMenu === 'notificaciones'
                       ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-500/50'
@@ -357,7 +363,7 @@ export default function ConsultorEstudianteDashboard({ userName, onLogout }: Con
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('mensajeria')}
+                  onClick={() => navigate('/estudiante/mensajeria')}
                   className={`relative p-2.5 rounded-xl transition-all ${
                     activeMenu === 'mensajeria'
                       ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-500/50'
@@ -380,7 +386,7 @@ export default function ConsultorEstudianteDashboard({ userName, onLogout }: Con
                 <motion.button
                   whileHover={{ scale: 1.05, rotate: 90 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('ajustes')}
+                  onClick={() => navigate('/estudiante/ajustes')}
                   className={`relative p-2.5 rounded-xl transition-all ${
                     activeMenu === 'ajustes'
                       ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-500/50'

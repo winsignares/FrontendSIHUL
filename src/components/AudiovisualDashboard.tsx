@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { 
   LayoutDashboard, 
@@ -42,8 +43,13 @@ type MenuOption = 'home' | 'horarios' | 'visualizacion' | 'prestamos' | 'ocupaci
 type MenuItem = { id: string; icon: any; label: string; action: MenuOption; badge?: string };
 
 export default function AudiovisualDashboard({ userName, onLogout }: AudiovisualDashboardProps) {
-  const [activeMenu, setActiveMenu] = useState<MenuOption>('home');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
+  // Extraer la ruta activa de la URL
+  const pathSegments = location.pathname.split('/').filter(Boolean);
+  const activeMenu = (pathSegments[1] || 'home') as MenuOption;
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['gestion']);
   const [notificacionesSinLeer, setNotificacionesSinLeer] = useState(5);
   const [mensajesSinLeer, setMensajesSinLeer] = useState(2);
@@ -88,7 +94,7 @@ export default function AudiovisualDashboard({ userName, onLogout }: Audiovisual
   const renderContent = () => {
     switch (activeMenu) {
       case 'home':
-        return <AudiovisualHome onNavigate={(menu) => setActiveMenu(menu as any)} />;
+        return <AudiovisualHome onNavigate={(menu) => navigate(`/audiovisual/${menu}`)} />;
       case 'horarios':
         return <HorariosAcademicos />;
       case 'visualizacion':
@@ -106,7 +112,7 @@ export default function AudiovisualDashboard({ userName, onLogout }: Audiovisual
       case 'ajustes':
         return <Ajustes />;
       default:
-        return <AudiovisualHome onNavigate={(menu) => setActiveMenu(menu as any)} />;
+        return <AudiovisualHome onNavigate={(menu) => navigate(`/audiovisual/${menu}`)} />;
     }
   };
 
@@ -201,7 +207,7 @@ export default function AudiovisualDashboard({ userName, onLogout }: Audiovisual
                             const buttonContent = (
                               <motion.button
                                 key={item.id}
-                                onClick={() => setActiveMenu(item.action as MenuOption)}
+                                onClick={() => navigate(`/audiovisual/${item.action}`)}
                                 className={`w-full flex items-center gap-3 rounded-xl transition-all duration-200 group relative ${
                                   isSidebarCollapsed ? 'justify-center px-3 py-3' : 'px-4 py-3'
                                 } ${
@@ -372,7 +378,7 @@ export default function AudiovisualDashboard({ userName, onLogout }: Audiovisual
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('notificaciones')}
+                  onClick={() => navigate('/audiovisual/notificaciones')}
                   animate={activeMenu === 'notificaciones' ? {
                     scale: [1, 1.1, 1],
                     rotate: [0, -10, 10, -10, 0]
@@ -415,7 +421,7 @@ export default function AudiovisualDashboard({ userName, onLogout }: Audiovisual
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('mensajeria')}
+                  onClick={() => navigate('/audiovisual/mensajeria')}
                   animate={activeMenu === 'mensajeria' ? {
                     scale: [1, 1.08, 1],
                   } : {}}
@@ -457,7 +463,7 @@ export default function AudiovisualDashboard({ userName, onLogout }: Audiovisual
                 <motion.button
                   whileHover={{ scale: 1.05, rotate: 90 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveMenu('ajustes')}
+                  onClick={() => navigate('/audiovisual/ajustes')}
                   className={`relative p-2.5 rounded-xl transition-all ${
                     activeMenu === 'ajustes'
                       ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-500/50'

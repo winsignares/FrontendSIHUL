@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { GraduationCap, Lock, User, ArrowRight } from 'lucide-react';
@@ -7,13 +8,8 @@ import { AuthService } from '../lib/auth';
 import type { Usuario } from '../lib/models';
 import universityImage from '../assets/Image/UniversidadLibre.webp';
 
-type UserRole = 'admin' | 'autorizado' | 'consultor' | 'consultorDocente' | 'consultorEstudiante' | null;
-
-interface LoginProps {
-  onLogin: (role: UserRole, name: string, usuario: Usuario) => void;
-}
-
-export default function Login({ onLogin }: LoginProps) {
+export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,7 +26,18 @@ export default function Login({ onLogin }: LoginProps) {
       const result = AuthService.login(email, password);
       
       if (result.success && result.usuario) {
-        onLogin(result.usuario.rol, result.usuario.nombre, result.usuario);
+        console.log('✅ Login exitoso:', result.usuario.nombre, result.usuario.rol);
+        
+        // Redirigir según el rol del usuario
+        const roleDashboards: Record<Usuario['rol'], string> = {
+          admin: '/admin',
+          autorizado: '/audiovisual',
+          consultor: '/consultor',
+          consultorDocente: '/docente',
+          consultorEstudiante: '/estudiante'
+        };
+        
+        navigate(roleDashboards[result.usuario.rol]);
       } else {
         setError(result.error || 'Error al iniciar sesión');
       }
